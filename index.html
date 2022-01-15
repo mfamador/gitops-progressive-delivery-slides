@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Flux v2 training</title>
+	<meta name="description" content="Flux v2 walkthrough">
+	<meta name="author" content="Marco Amador">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/black.css" id="theme">
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	<link rel="icon" href="https://www.anova.com/wp-content/uploads/2020/11/cropped-Favicon_Anova-32x32.png"
+		sizes="32x32" />
+	<link rel="icon" href="https://www.anova.com/wp-content/uploads/2020/11/cropped-Favicon_Anova-192x192.png"
+		sizes="192x192" />
+	<link rel="apple-touch-icon"
+		href="https://www.anova.com/wp-content/uploads/2020/11/cropped-Favicon_Anova-180x180.png" />
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+
+			<section>
+				<a href="https://fluxcd.io/">
+					<img src="https://raw.githubusercontent.com/cncf/artwork/d76a3a4b90804c1a66aa6725d03f9c88f706703b/projects/flux/horizontal/white/flux-horizontal-white.svg"
+						alt="flux v2" style="height: 180px; margin: 0 auto 4rem auto; background: transparent;"
+						class="demo-logo">
+				</a>
+				<h3>Flux v2 walkthrough</h3>
+				<p>
+					<small>Jul 29th, 2021 &nbsp;&nbsp;<a href="http://github.com/mfamador">Marco Amador</a></small>
+				</p>
+				<a href="https://www.anova.com">
+					<img src="https://media-exp1.licdn.com/dms/image/C560BAQFmeIBdL-FytA/company-logo_200_200/0/1578001449436?e=1634169600&v=beta&t=fjJWFS8UoY9Ck6PiSTZMTxw6iSKtibzHf8YDJ3pRNm8"
+						alt="flux v2" style="height: 100px; margin: 0 auto 4rem auto; background: transparent;"
+						class="demo-logo">
+				</a>
+			</section>
+
+			<section data-auto-animate>
+				<h1>GitOps</h1>
+				<p>
+					GitOps is a way of managing your infrastructure and applications so that whole system is described
+					declaratively and version controlled (most likely in a Git repository), and having an automated
+					process that ensures that the deployed environment matches the state specified in a repository.
+				</p>
+			</section>
+			<section data-auto-animate>
+				<h1>GitOps</h1>
+				<img src="assets/gitops.png">
+			</section>
+
+			<section data-transition="convex">
+				<section data-transition="convex">
+					<h2>Flux v2</h2>
+					<p>Core Concepts</p>
+					<br>
+					<a href="#" class="navigate-down">
+						<img class="r-frame" style="background: rgba(255,255,255,0.1);" width="178" height="238"
+							data-src="https://static.slid.es/reveal/arrow.png" alt="Down arrow">
+					</a>
+				</section>
+				<section>
+					<h2>Sources</h2>
+					<p>A Source defines the origin of a repository containing the desired state of the system and the
+						requirements to obtain.</p>
+					<p>All sources are specified as Custom Resources in a Kubernetes cluster, examples of sources are
+						<em>GitRepository</em>, <em>HelmRepository</em> and <em>Bucket</em> resources.
+					</p>
+				</section>
+				<section>
+					<h2>Kustomization</h2>
+					<p>The Kustomization custom resource represents a local set of Kubernetes resources (e.g. kustomize
+						overlay) that Flux is supposed to reconcile in the cluster.</p>
+				</section>
+				<section>
+					<h2>Reconciliation</h2>
+					<p>Reconciliation refers to ensuring that a given state (e.g. application running in the cluster,
+						infrastructure) matches a desired state declaratively defined somewhere (e.g. a Git repository).
+					</p>
+					<br>
+					<a href="#/3">
+						<img class="r-frame" style="background: rgba(255,255,255,0.1); transform: rotate(180deg);"
+							width="178" height="238" data-src="https://static.slid.es/reveal/arrow.png" alt="Up arrow">
+					</a>
+				</section>
+			</section>
+
+			<section data-transition="convex">
+				<section data-transition="convex">
+					<h2>Flux v2</h2>
+					<p>Core Components</p>
+					<br>
+					<a href="#" class="navigate-down">
+						<img class="r-frame" style="background: rgba(255,255,255,0.1);" width="178" height="238"
+							data-src="https://static.slid.es/reveal/arrow.png" alt="Down arrow">
+					</a>
+				</section>
+				<section>
+					<h2>Source controller</h2>
+					<p>The main role of the source management component is to provide a common interface for artifacts
+						acquisition. The source API defines a set of Kubernetes objects that cluster admins and various
+						automated operators can interact with to offload the Git and Helm repositories operations to a
+						dedicated controller.</p>
+				</section>
+				<section>
+					<h2>Kustomize controller</h2>
+					<p>The kustomize-controller is a Kubernetes operator, specialized in running continuous delivery
+						pipelines for infrastructure and workloads defined with Kubernetes manifests and assembled with
+						Kustomize.</p>
+				</section>
+				<section>
+					<h2>Helm controller</h2>
+					<p>The Helm Controller is a Kubernetes operator, allowing one to declaratively manage Helm chart
+						releases with Kubernetes manifests.</p>
+				</section>
+				<section>
+					<h2>Image Reflector and Image Automation controllers</h2>
+					<p>The image-reflector-controller and image-automation-controller work together to update a Git
+						repository when new container images are available.</p>
+				</section>
+				<section>
+					<h2>Notification controller</h2>
+					<p>The Notification Controller is a Kubernetes operator, specialized in handling inbound and
+						outbound events.
+					</p>
+					<p class="fragment fade-in">
+						<ul>
+							<li>Discord</li>
+							<li>Microsoft Teams</li>
+							<li>Rocket</li>
+							<li>Google Chat</li>
+							<li>Webex</li>
+							<li>Sentry</li>
+							<li>Azure Event Hub</li>
+							<li>Generic webhook</li>
+						</ul>
+					</p>
+
+					<a href="#/4">
+						<img class="r-frame" style="background: rgba(255,255,255,0.1); transform: rotate(180deg);"
+							width="178" height="238" data-src="https://static.slid.es/reveal/arrow.png" alt="Up arrow">
+					</a>
+				</section>
+			</section>
+
+			<section>
+				<h2>Flux v2 architecture</h2>
+				<img data-src="assets/gitops-toolkit.png" width="70%">
+			</section>
+
+			<section data-auto-animate>
+				<h2 data-id="code-title">Main Git source</h2>
+				<pre data-id="code1"><code class="hljs" data-trim data-line-numbers="|10|13">
+						apiVersion: source.toolkit.fluxcd.io/v1beta1
+						kind: GitRepository
+						metadata:
+						  name: flux-system
+						  namespace: flux-system
+						spec:
+						  gitImplementation: libgit2
+						  interval: 1m0s
+						  ref:
+						    branch: master
+						  secretRef:
+						    name: flux-system
+						  url: ssh://git@ssh.dev.azure.com/v3/anovateam/Mapleleaf/gitops-live
+					</code></pre>
+			</section>
+
+			<section data-auto-animate>
+				<h2 data-id="code-title">Main kustomization</h2>
+				<pre data-id="code2"><code class="hljs" data-trim data-line-numbers="|8|11-12">
+						apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+						kind: Kustomization
+						metadata:
+							name: flux-system
+							namespace: flux-system
+						spec:
+							interval: 10m0s
+							path: ./clusters/staging/northeurope
+							prune: true
+							sourceRef:
+								kind: GitRepository
+								name: flux-system
+					</code></pre>
+			</section>
+
+
+			<section>
+				<section data-auto-animate>
+					<h2 data-id="code-title">Flux resources</h2>
+					<pre data-id="code"><code class="hljs" data-trim data-line-numbers="|1|3|5">
+							kubectl get kustomization --all-namespaces
+
+							kubectl get gitrepositories --all-namespaces
+							
+							kubectl get helmrepository --all-namespaces	
+						</code></pre>
+				</section>
+				<section data-markdown>
+					<script type="text/template">
+							## Install Flux CLI
+
+							With Homebrew:
+							```
+							brew install fluxcd/tap/flux
+							```
+
+							With Bash:
+							```bash
+							curl -s https://toolkit.fluxcd.io/install.sh | sudo bash
+							```
+
+							Verify that your cluster satisfies the prerequisites with:
+
+							```
+							flux check --pre
+							```
+						</script>
+				</section>
+				<section data-auto-animate>
+					<h2 data-id="code-title">Flux CLI</h2>
+					<pre data-id="code"><code class="hljs" data-trim data-line-numbers="|1|3|5">
+							flux get kustomizations --all-namespaces
+
+							flux get sources git --all-namespaces
+
+							flux get sources helm --all-namespaces					
+						</code></pre>
+				</section>
+
+
+				<section data-auto-animate>
+					<h2 data-id="code-title">Flux reconciliation</h2>
+					<pre data-id="code"><code class="hljs" data-trim data-line-numbers="|1|3|5">
+							flux reconcile kustomization core -n core
+
+							flux reconcile source git core -n core
+
+							flux reconcile helmrelease identity -n core					
+						</code></pre>
+				</section>
+			</section>
+			<!-- <section>
+					<p>Add the <code>r-fit-text</code> class to auto-size text</p>
+					<h2 class="r-fit-text">FIT TEXT</h2>
+				</section> -->
+
+			<!-- <section id="transitions">
+					<h2>Transition Styles</h2>
+					<p>
+						You can select from different transitions, like: <br>
+						<a href="?transition=none#/transitions">None</a> -
+						<a href="?transition=fade#/transitions">Fade</a> -
+						<a href="?transition=slide#/transitions">Slide</a> -
+						<a href="?transition=convex#/transitions">Convex</a> -
+						<a href="?transition=concave#/transitions">Concave</a> -
+						<a href="?transition=zoom#/transitions">Zoom</a>
+					</p>
+				</section> -->
+
+			<!-- <section>
+					<section data-background="#dddddd">
+						<h2>Slide Backgrounds</h2>
+						<p>
+							Set <code>data-background="#dddddd"</code> on a slide to change the background color. All CSS color formats are supported.
+						</p>
+						<a href="#" class="navigate-down">
+							<img class="r-frame" style="background: rgba(255,255,255,0.1);" width="178" height="238" data-src="https://static.slid.es/reveal/arrow.png" alt="Down arrow">
+						</a>
+					</section>
+					<section data-background="https://static.slid.es/reveal/image-placeholder.png">
+						<h2>Image Backgrounds</h2>
+						<pre><code class="hljs html">&lt;section data-background="image.png"&gt;</code></pre>
+					</section>
+					<section data-background="https://static.slid.es/reveal/image-placeholder.png" data-background-repeat="repeat" data-background-size="100px">
+						<h2>Tiled Backgrounds</h2>
+						<pre><code class="hljs html" style="word-wrap: break-word;">&lt;section data-background="image.png" data-background-repeat="repeat" data-background-size="100px"&gt;</code></pre>
+					</section>
+					<section data-background-video="https://s3.amazonaws.com/static.slid.es/site/homepage/v1/homepage-video-editor.mp4" data-background-color="#000000">
+						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+							<h2>Video Backgrounds</h2>
+							<pre><code class="hljs html" style="word-wrap: break-word;">&lt;section data-background-video="video.mp4,video.webm"&gt;</code></pre>
+						</div>
+					</section>
+					<section data-background="http://i.giphy.com/90F8aUepslB84.gif">
+						<h2>... and GIFs!</h2>
+					</section>
+				</section> -->
+
+			<!-- <section data-transition="slide" data-background="#4d7e65" data-background-transition="zoom">
+					<h2>Background Transitions</h2>
+					<p>
+						Different background transitions are available via the backgroundTransition option. This one's called "zoom".
+					</p>
+					<pre><code class="hljs javascript">Reveal.configure({ backgroundTransition: 'zoom' })</code></pre>
+				</section>
+
+				<section data-transition="slide" data-background="#b5533c" data-background-transition="zoom">
+					<h2>Background Transitions</h2>
+					<p>
+						You can override background transitions per-slide.
+					</p>
+					<pre><code class="hljs html" style="word-wrap: break-word;">&lt;section data-background-transition="zoom"&gt;</code></pre>
+				</section> -->
+
+			<!-- <section data-background-iframe="https://hakim.se" data-background-interactive>
+					<div style="position: absolute; width: 40%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: left;">
+						<h2>Iframe Backgrounds</h2>
+						<p>Since reveal.js runs on the web, you can easily embed other web content. Try interacting with the page in the background.</p>
+					</div>
+				</section> -->
+
+			<section>
+				<h2>GitOps Repos</h2>
+				<ul>
+					<li>gitops-live</li>
+					<li>gitops-core</li>
+					<li>gitops-transform</li>
+					<li>gitops-data</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Ownership</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>Repo</th>
+							<th>Team</th>
+							<th>Project</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>gitops-live</td>
+							<td>Infra</td>
+							<td>Platform</td>
+						</tr>
+						<tr>
+							<td>gtiops-core</td>
+							<td>Core / SM</td>
+							<td>Core and SM<SMall></SMall></td>
+						</tr>
+						<tr>
+							<td>gitops-transform</td>
+							<td>Transform</td>
+							<td>Transform</td>
+						</tr>
+						<tr>
+							<td>gitops-data</td>
+							<td>Data</td>
+							<td>Data</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+
+			<section data-auto-animate>
+				<h2 data-id="code-title">gitops-live</h2>
+				<pre data-id="code1"><code data-trim data-line-numbers="|1">
+						├── clusters
+						│   ├── production
+						│   │   ├── eastus
+						│   │   └── norteurope
+						│   └── staging
+						│       ├── eastus
+						│       └── northeurope
+						├── operations
+						│   ├── manifests
+						│   │   ├── production
+						│   │   └── staging
+						│   └── releases
+						│       ├── production
+						│       └── staging
+						├── policies
+						└── tenants
+							├── base
+							│   ├── core
+							│   ├── data
+							│   └── transform
+							├── production
+							│   ├── eastus
+							│   └── northeurope
+							└── staging
+								├── eastus
+								└── northeurope
+					</code></pre>
+			</section>
+
+			<section data-auto-animate>
+				<h2 data-id="code-title">gitops-live</h2>
+				<pre data-id="code1"><code data-trim data-line-numbers="2-7|2-7|12|13-15|16-18|19|20|21-24|25-30">
+						├── clusters
+						│   ├── production
+						│   │   ├── eastus
+						│   │   │   ├── flux-system
+						│   │   │   ├── operations.yaml
+						│   │   │   ├── policies.yaml
+						│   │   │   └── tenants.yaml
+						│   │   └── norteurope
+						│   └── staging
+						│       ├── eastus
+						│       └── northeurope
+						├── operations
+						│   ├── manifests
+						│   │   ├── production
+						│   │   └── staging
+						│   └── releases
+						│       ├── production
+						│       └── staging
+						├── policies
+						└── tenants
+							├── base
+							│   ├── core
+							│   ├── data
+							│   └── transform
+							├── production
+							│   ├── eastus
+							│   └── northeurope
+							└── staging
+								├── eastus
+								└── northeurope
+					</code></pre>
+			</section>
+
+
+			<section>
+				<h2>Tenant git source</h2>
+				<pre><code class="hljs" data-trim data-line-numbers="|11">
+                        apiVersion: source.toolkit.fluxcd.io/v1beta1
+                        kind: GitRepository
+                        metadata:
+                          name: core
+                          namespace: core
+                        spec:
+                          gitImplementation: libgit2
+                          interval: 5m0s
+                          ref:
+                            branch: master
+                          url: ssh://git@ssh.dev.azure.com/v3/anovateam/Mapleleaf/gitops-core
+					</code></pre>
+			</section>
+
+			<section>
+				<h2>Tenant kustomization</h2>
+				<pre><code class="hljs" data-trim data-line-numbers="|9|12-14">
+						apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+						kind: Kustomization
+						metadata:
+						  name: core
+						  namespace: core
+						spec:
+						  force: false
+						  interval: 5m0s
+						  path: ./staging/eastus
+						  prune: true
+						  serviceAccountName: core
+						  sourceRef:
+						    kind: GitRepository
+						    name: core
+					</code></pre>
+			</section>
+
+
+			<section data-auto-animate>
+				<h2 data-id="code-title">gitops-&lt;tenant&gt;</h2>
+				<pre data-id="code1"><code class="hljs" data-trim data-line-numbers="|3|7|8-13|20|21-26|27-32">
+						├── _automation
+						├── _sources
+						├── base
+						│   ├── kustomization.yaml
+						│   ├── my-release.yaml
+						│   └── my-other-release.yaml
+						├── production
+						│   ├── eastus
+						│   │   ├── kustomization.yaml
+						│   │   ├── my-release-patch.yaml
+						│   │   ├── my-release-patch-generated.yaml
+						│   │   ├── my-other-release-patch.yaml
+						│   │   └── my-other-release-patch-generated.yaml
+						│   └── northeurope
+						│       ├── kustomization.yaml
+						│       ├── my-release-patch.yaml
+						│       ├── my-release-patch-generated.yaml
+						│       ├── my-other-release-patch.yaml
+						│       └── my-other-release-patch-generated.yaml
+						└── staging
+							├── eastus
+							│   ├── kustomization.yaml
+							│   ├── my-release-patch.yaml
+							│   ├── my-release-patch-generated.yaml
+							│   ├── my-other-release-patch.yaml
+							│   └── my-other-release-patch-generated.yaml
+							└── northeurope
+								├── kustomization.yaml
+								├── my-release-patch.yaml
+								├── my-release-patch-generated.yaml
+								├── my-other-release-patch.yaml
+								└── my-other-release-patch-generated.yaml
+					</code></pre>
+			</section>
+
+			<section data-auto-animate>
+				<h2 data-id="code-title">Helm release</h2>
+
+				<section>
+					<p class="fragment fade-in">
+					<pre>app-base.yaml</pre>
+					<pre data-id="code1"><code class="hljs" data-trim data-line-numbers="|2|4|8-13|19">
+							apiVersion: helm.toolkit.fluxcd.io/v2beta1
+							kind: HelmRelease
+							metadata:
+								name: my-app
+							spec:
+								releaseName: my-app
+								serviceAccountName: my-tenant
+								chart:
+									spec:
+									chart: anova-k8s-deployment
+									sourceRef:
+										kind: GitRepository
+										name: anova-helm-chart-stable
+								interval: 5m
+								install:
+									remediation:
+									retries: 3
+								values:
+									migrations:
+										enabled: true
+						</code></pre>
+					</p>
+				</section>
+				<section>
+					<p class="fragment fade-in">
+					<pre>app-patch.yaml</pre>
+					<pre data-id="code1"><code class="hljs" data-trim data-line-numbers="|2|4|7-8|10-11">
+							apiVersion: helm.toolkit.fluxcd.io/v2beta1
+							kind: HelmRelease
+							metadata:
+							   name: my-app
+							spec:
+								values:
+									environment: staging
+									region: ue
+									image:
+										repository: acrmapleleafstag.azurecr.io/my-app
+										tag: 0.1.82 # {"$imagepolicy": "data:staging-ue-my-app:tag"}
+									env:
+									- name: LOGLEVEL
+									  value: DEBUG
+						</code></pre>
+					</p>
+				</section>
+				<section>
+					<p class="fragment fade-in">
+					<pre>kustomization.yaml</pre>
+					<pre data-id="code1"><code class="hljs" data-trim data-line-numbers="|2|4|7-8|10-11">
+							apiVersion: kustomize.config.k8s.io/v1beta1
+							kind: Kustomization
+							namespace: data
+							resources:
+							- app-base.yaml
+							patchesStrategicMerge:
+							- app-patch.yaml
+							- app-patch-generated.yaml
+						 </code></pre>
+					</p>
+				</section>
+
+				<section>
+					<p class="fragment fade-in">
+					<pre>kustomize build .</pre>
+					<pre data-id="code1"><code class="hljs" data-trim data-line-numbers="|18|19-20|21-27">
+								apiVersion: helm.toolkit.fluxcd.io/v2beta1
+								kind: HelmRelease
+								metadata:
+									name: my-app
+								spec:
+									releaseName: my-app
+									serviceAccountName: my-tenant
+									chart:
+										spec:
+										chart: anova-k8s-deployment
+										sourceRef:
+											kind: GitRepository
+											name: anova-helm-chart-stable
+									interval: 5m
+									install:
+										remediation:
+										retries: 3
+									values:
+										migrations:
+											enabled: true
+										environment: staging
+										region: ue
+										image:
+											repository: acrmapleleafstag.azurecr.io/my-app
+											tag: 0.1.82 # {"$imagepolicy": "data:staging-ue-my-app:tag"}
+										env:
+										- name: LOGLEVEL
+										  value: DEBUG
+							</code></pre>
+					</p>
+				</section>
+			</section>
+
+
+			<section data-auto-animate>
+				<section>
+					<h2>Image Automation</h2>
+					<p><img data-src="assets/image-update-automation.png"></p>
+					<a href="#/16/2">
+						<img class="r-frame" style="background: rgba(255,255,255,0.1); " width="78" height="98"
+							data-src="https://static.slid.es/reveal/arrow.png" alt="Down arrow">
+					</a>
+				</section>
+				<section>
+					<h2>Image policy</h2>
+					<p>The ImagePolicy type gives rules for selecting a “latest” image from a scanned ImageRepository.
+						This can be used to drive automation, as with the image-automation-controller; or more
+						generally, to inform other processes of the state of an image repository.
+					</p>
+				</section>
+				<section>
+					<h2>Image repository</h2>
+					<p>The ImageRepository API specifies how to scan OCI image repositories. A repository is a
+						collection of images – e.g., alpine, as opposed to a specific image, e.g., alpine:3.1.
+						ImagePolicy objects can then refer to an ImageRepository in order to select a specific image
+						from those scanned.
+					</p>
+				</section>
+				<section>
+					<h2>Image update automation</h2>
+					<p>The ImageUpdateAutomation type defines an automation process that will update a git repository,
+						based on image policiy objects in the same namespace.</p>
+					<br>
+					<a href="#/16">
+						<img class="r-frame" style="background: rgba(255,255,255,0.1); transform: rotate(180deg);"
+							width="178" height="238" data-src="https://static.slid.es/reveal/arrow.png" alt="Up arrow">
+					</a>
+				</section>
+			</section>
+
+			<section data-auto-animate>
+				<h2>Image automation</h2>
+				<section>
+					<span class="fragment">
+						<pre><code class="hljs" data-trim data-line-numbers="">
+								❯ kubectl get imagerepository my-app
+								NAME                          LAST SCAN              TAGS
+								my-app                        2021-07-14T18:42:53Z   20
+							</code></pre>
+					</span>
+
+					<span class="fragment">
+						<pre><code class="hljs" data-trim data-line-numbers="">
+								❯ kubectl get imagerepository my-app -oyaml
+								apiVersion: image.toolkit.fluxcd.io/v1beta1
+								kind: ImageRepository
+								metadata:
+									name: my-app
+									namespace: data
+								spec:
+									image: myacr.azurecr.io/my-app
+									interval: 5m0s
+							</code></pre>
+					</span>
+				</section>
+				<section>
+					<span>
+						<pre><code class="hljs" data-trim data-line-numbers="1-18|20-22">
+							❯ k get imageupdateautomation tenant -n tenant -oyaml
+							piVersion: image.toolkit.fluxcd.io/v1beta1
+							kind: ImageUpdateAutomation
+							metadata:
+								name: tenant
+								namespace: tenant
+							spec:
+								git:
+									checkout:
+									ref:
+										branch: master
+									commit:
+									author:
+										email: fluxcdbot@users.noreply.github.com
+										name: fluxcdbot
+									messageTemplate: |
+										An automated update from FluxBot
+										[ci skip]
+								interval: 5m
+								sourceRef:
+									kind: GitRepository
+									name: tenant
+							</code></pre>
+					</span>
+				</section>
+				<section>
+					<span>
+						<pre><code class="hljs" data-trim data-line-numbers="1-7|9-15|23-26">
+							❯ git log
+							commit bcb890b12f623a901295fad68a92f899d7a1279d (HEAD -> master, origin/master, origin/HEAD)
+							Author: fluxcdbot <fluxcdbot@users.noreply.github.com>
+							Date:   Thu Jul 15 07:39:26 2021 +0000
+
+								An automated update from FluxBot
+								[ci skip]  
+
+							❯ git whatchanged -m -n 1 -p bcb890b12f623a901295fad68a92f899d7a1279d
+							commit bcb890b12f623a901295fad68a92f899d7a1279d (HEAD -> master, origin/master, origin/HEAD)
+							Author: fluxcdbot <fluxcdbot@users.noreply.github.com>
+							Date:   Thu Jul 15 07:39:26 2021 +0000
+
+								An automated update from FluxBot
+								[ci skip]
+
+							diff --git a/production/eastus/entities-digestor-patch.yaml b/production/eastus/entities-digestor-patch.yaml
+							index f36aefd..63dc20e 100644
+							--- a/production/eastus/entities-digestor-patch.yaml
+							+++ b/production/eastus/entities-digestor-patch.yaml
+							@@ -8,7 +8,7 @@ spec:
+								region: ue
+								image:
+								repository: acrmapleleafprod.azurecr.io/entities-digestor
+							-      tag: 0.1.18 # {"$imagepolicy": "data:production-ue-entities-digestor:tag"}
+							+      tag: 0.1.19 # {"$imagepolicy": "data:production-ue-entities-digestor:tag"}
+							</code></pre>
+					</span>
+				</section>
+			</section>
+
+			<section data-auto-animate>
+				<section>
+					<h2>Image automation</h2>
+					<span class="fragment">
+						<pre><code class="hljs" data-trim data-line-numbers="">
+								❯ flux get image repository -n core apistatus
+								NAME     	READY	MESSAGE                      	LAST SCAN                	SUSPENDED
+								apistatus	True 	successful scan, found 1 tags	2021-07-26T12:51:27+01:00	False
+							</code></pre>
+					</span>
+					<span class="fragment">
+						<pre><code class="hljs" data-trim data-line-numbers="">
+								❯ flux get image policy -n core staging-ue-apistatus
+								NAME                	READY	MESSAGE                                                                         	LATEST IMAGE
+								staging-ue-apistatus	True 	Latest image tag for 'acrmapleleafstag.azurecr.io/apistatus' resolved to: 1.0.27	acrmapleleafstag.azurecr.io/apistatus:1.0.27
+							</code></pre>
+					</span>
+					<span class="fragment">
+						<pre><code class="hljs" data-trim data-line-numbers="">
+								❯ flux get image update -n core
+								NAME	READY	MESSAGE                                                     	LAST RUN                 	SUSPENDED
+								core	True 	no updates made; last commit 69ac834 at 2021-07-26T11:07:39Z	2021-07-26T12:53:32+01:00	False
+							</code></pre>
+					</span>
+				</section>
+
+				<section>
+					<h2>Image rollback</h2>
+					<span class="fragment">
+						<p>Base</p>
+						<pre><code class="hljs" data-trim data-line-numbers="">
+							image:
+							  automation:
+							    enabled: true
+							    semver:
+							      expr: x.x.x 
+							</code></pre>
+					</span>
+					<span class="fragment">
+						<p>Patch in environment</p>
+						<pre><code class="hljs" data-trim data-line-numbers="">
+							image:
+							  repository: acrmapleleafstag.azurecr.io/assetsreports
+							  tag: 0.1.8 # {"$imagepolicy": "core:staging-ue-assetsreportsapi:tag"}
+							  automation:
+							    semver:
+								    expr: 0.1.8 # temporarily fixing this tag
+							</code></pre>
+					</span>
+				</section>
+			</section>
+
+			<section>
+				<a target="_blank" href="https://fluxcd.io/">
+					<img src="https://raw.githubusercontent.com/cncf/artwork/d76a3a4b90804c1a66aa6725d03f9c88f706703b/projects/flux/horizontal/white/flux-horizontal-white.svg"
+						alt="flux v2" style="height: 180px; margin: 0 auto 4rem auto; background: transparent;"
+						class="demo-logo">
+				</a>
+			</section>
+
+			<section data-autoanimate data-background-image="assets/contributors.png">
+				<h2 data-id="title">OSS Contributors</h2>
+			</section>
+
+			<section data-autoanimate data-background-image="assets/contributors-me1.png" data-autoslide="1000">
+				<h2 data-id="title"></h2>
+			</section>
+
+			<section data-background-image="assets/contributors-me.png">
+				<h2 data-id="title"></h2>
+			</section>
+
+			<section id="grand-finale">
+				<p class="fragment fade-in">
+					<img src="assets/marchimedes_small.png" />
+				</p>
+				<p>
+				<blockquote>
+					&ldquo;Give GitOps and Kubernetes and I'll scale the World.&rdquo;
+					<br>
+					<small><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MArchimedes</em></small>
+				</blockquote>
+				</p>
+			</section>
+
+			<section>
+				<h3>Over and out</h3>
+			</section>
+
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/zoom/zoom.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/search/search.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// Also available as an ES module, see:
+		// https://revealjs.com/initialization/
+		Reveal.initialize({
+			// parallaxBackgroundImage: "https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg",
+			// parallaxBackgroundSize: "2100px 900px",
+
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+		});
+
+	</script>
+
+</body>
+
+</html>
